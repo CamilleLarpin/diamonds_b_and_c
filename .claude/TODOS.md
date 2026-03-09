@@ -9,12 +9,7 @@
 
 ## Now — Séquence cible
 
-### 1. Setup tooling
-- [ ] Configurer Ruff dans `pyproject.toml` (`[tool.ruff]` — lint E/F/I/N + format, line-length 88)
-- [ ] Créer `.pre-commit-config.yaml` — hooks : `ruff` + `typos`
-- [ ] `pre-commit install`
-- [ ] Créer `Makefile` — cibles : `lint`, `train`, `test`
-- [ ] Configurer `pytest` dans `pyproject.toml` (`[tool.pytest.ini_options]`)
+### ~~1. Setup tooling~~ ✓ — PR open: `camille/setup-tooling`
 
 ### 2. Implémenter `data.py`
 - [ ] `load_data()` — charger le CSV depuis `data/raw/` (ou seaborn fallback)
@@ -26,9 +21,9 @@
 ### 3. Implémenter `model.py`
 - [ ] `create_preproc()` — pipeline sklearn (ColumnTransformer)
 - [ ] `create_model()` — retourner le modèle sélectionné par `model_name`
-- [ ] `train_model()` — fitter le modèle sur X_train, y_train
-- [ ] `evaluate_model()` — calculer MAE, MSE, R², MAPE ; logger les métriques (pas print)
-- [ ] `predict()` — appliquer preproc + model sur données brutes
+- [ ] `train_model()` — fitter le modèle sure X_train, y_train
+- [ ] `evaluate_model()` — calculer MAE, MSE, R², MAP ; logger les métriques (pas print)
+- [ ] `predict()` — appliquer preproc + model sure données brutes
 
 ### 4. Implémenter `registry.py`
 - [ ] `save_model()` — sérialiser avec joblib dans `models/`
@@ -43,12 +38,13 @@
 - [ ] `tests/test_data.py` — shape, types, absence de NaN après chaque étape
 - [ ] `tests/test_model.py` — modèle fittable, predict retourne la bonne shape
 - [ ] `tests/test_registry.py` — save → load → predict identique
-- [ ] GitHub Actions CI — pytest sur chaque push
+- [ ] GitHub Actions CI — pytest sure chaque push
 
 ## Blocked
 — aucun
 
 ## Done (recent — clear periodically)
 - [x] Structure du package initialisée (`data.py`, `model.py`, `registry.py`, `train.py`, `params.py`)
-- [x] Stubs + docstrings NumPy en place sur toutes les fonctions publiques
+- [x] Stubs + docstrings NumPy en place sure toutes les functions publiques
 - [x] `data/raw/` et `models/` trackés dans git (`.gitkeep`)
+- [x] Tooling setup — ruff, pre-commit, pytest, Makefile (PR: `camille/setup-tooling`)

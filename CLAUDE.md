@@ -32,6 +32,11 @@ Two contributors: **Camille** and **Boubachar**.
 - Always create a feature branch: `git checkout -b <name>/<feature>`
 - Open a PR before merging — no self-merge without review
 
+**Remotes** (forked repo):
+- `fork` → `CamilleLarpin/diamonds_b_and_c` — push branches here
+- `origin` → `vivadata/diamonds` — upstream, read-only
+- Always push to `fork`: `git push -u fork <branch>`
+
 ## Code standards
 
 ### Linting & formatting — Ruff
