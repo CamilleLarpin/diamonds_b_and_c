@@ -1,6 +1,8 @@
 from sklearn.base import BaseEstimator, Pipeline
 from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import KNNImputer, SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, ColumnTransformer, make_column_selector
 
 def create_model(model_name: str) -> BaseEstimator:
     """
@@ -36,9 +38,28 @@ def create_preproc() -> Pipeline:
     """
     Create a preprocessing pipeline.
     """
-    pass
+    # categorical pipeline
+    cat_pipe = Pipeline(
+    [ ("cat_imp",SimpleImputer(strategy="most_frequent"))
+      ,("ohe",OneHotEncoder(drop="first",sparse_output=False))
+        ])
+        
+    # numerical pipeline
+    num_pipe = Pipeline(
+    [("knn_imp", KNNImputer(n_neighbors=5))
+     ,("scaler", StandardScaler())
+      ])
+    
+     # numerical and categorical pipeline
+    preprocessor = ColumnTransformer(
+    [("numeric",num_pipe, make_column_selector(dtype_include="number"))
+    ,("categorical", cat_pipe, make_column_selector(dtype_exclude="number"))
+      ]).set_output(transform="pandas")
+    return preprocessor
+
 
 def train_model(model, X_train, y_train):
+    model.fit(X_train, y_train)
     pass
 
 def evaluate_model(model, X_test, y_test) -> dict[str, float]:
