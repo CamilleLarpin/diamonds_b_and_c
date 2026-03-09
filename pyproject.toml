@@ -9,13 +9,36 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "scikit-learn (>=1.8.0,<2.0.0)",
-    "pandas (>=3.0.1,<4.0.0)"
+    "pandas (>=3.0.1,<4.0.0)",
+    "seaborn (>=0.13.0,<1.0.0)"
 ]
 
 [tool.poetry]
 
 [tool.poetry.group.dev.dependencies]
 notebook = "^7.5.4"
+ruff = ">=0.9.0"
+pre-commit = ">=4.0.0"
+pytest = ">=8.0.0"
+
+# --- Ruff: replaces flake8 (lint) + black (format) ---
+
+[tool.ruff]
+line-length = 88  # black-compatible default
+exclude = ["notebooks/"]
+
+[tool.ruff.lint]
+# E: pycodestyle errors, F: pyflakes, I: isort, N: naming conventions
+select = ["E", "F", "I", "N"]
+# N802/N803/N806: uppercase X/y is standard sklearn convention for feature matrix / target vector
+ignore = ["N802", "N803", "N806"]
+
+# --- Pytest ---
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+
+# --- Build ---
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
