@@ -1,5 +1,6 @@
 from sklearn.base import BaseEstimator, Pipeline
-
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
 
 def create_model(model_name: str) -> BaseEstimator:
     """
@@ -15,6 +16,20 @@ def create_model(model_name: str) -> BaseEstimator:
     BaseEstimator
         The model ready to be fitted
     """
+    BEST_PARAMS = {
+    "ridge": {"alpha": 1.0},
+    "random_forest": {"n_estimators": 200, "max_depth": 10, "random_state": 42},
+    }
+    
+    if model_name == "ridge":
+        return Ridge(**BEST_PARAMS["ridge"])
+
+    elif model_name == "random_forest":
+        return RandomForestRegressor(**BEST_PARAMS["random_forest"])
+
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")   
+           
     pass
 
 def create_preproc() -> Pipeline:
