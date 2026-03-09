@@ -3,6 +3,8 @@ from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, ColumnTransformer, make_column_selector
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np
 
 def create_model(model_name: str) -> BaseEstimator:
     """
@@ -65,6 +67,25 @@ def train_model(model, X_train, y_train):
 def evaluate_model(model, X_test, y_test) -> dict[str, float]:
     # NB : mae, mse, r2_score, mape
     # Only print the metrics for now
+    y_pred = model.predict(X_test)
+
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+    mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+
+    metrics = {
+        "mae": mae,
+        "mse": mse,
+        "r2_score": r2,
+        "mape": mape,
+    }
+
+    print("Model Evaluation Metrics:")    
+    for metric, value in metrics.items():
+        print(f"  {metric.upper()}: {value:.4f}")
+
+    return metrics
     pass
 
 def predict(model, X):
@@ -84,3 +105,5 @@ def predict(model, X):
         The predicted values
     """
     
+    predictions = model.predict(X)
+    return predictions
