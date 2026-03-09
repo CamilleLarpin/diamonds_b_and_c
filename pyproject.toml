@@ -28,10 +28,13 @@ pytest = ">=8.0.0"
 
 [tool.ruff]
 line-length = 88  # black-compatible default
+exclude = ["notebooks/"]
 
 [tool.ruff.lint]
 # E: pycodestyle errors, F: pyflakes, I: isort, N: naming conventions
 select = ["E", "F", "I", "N"]
+# N802/N803: uppercase X/y is standard sklearn convention for feature matrix / target vector
+ignore = ["N802", "N803"]
 
 # --- Pytest ---
 
