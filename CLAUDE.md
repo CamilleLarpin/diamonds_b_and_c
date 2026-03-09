@@ -33,7 +33,7 @@ Two contributors: **Camille** and **Boubachar**.
 - Open a PR before merging — no self-merge without review
 
 **Remotes** (forked repo):
-- `fork` → `CamilleLarpin/diamonds_b_and_c` — push branches here
+- `fork` → `CamilleLarpin/diamonds_b_and_c` — push branches here (use SSH: `git@github.com:CamilleLarpin/diamonds_b_and_c.git`)
 - `origin` → `vivadata/diamonds` — upstream, read-only
 - Always push to `fork`: `git push -u fork <branch>`
 
