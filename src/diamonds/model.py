@@ -5,6 +5,7 @@ from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, ColumnTransformer, make_column_selector
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
+import pandas as pd
 
 def create_model(model_name: str) -> BaseEstimator:
     """
@@ -106,4 +107,4 @@ def predict(model, X):
     """
     
     predictions = model.predict(X)
-    return predictions
+    return pd.Series(predictions, index=X.index)
