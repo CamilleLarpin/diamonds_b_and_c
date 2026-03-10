@@ -1,48 +1,48 @@
 import os
 
 import pandas as pd
+import loguru
+import os
+
+# For loading data
 import seaborn as sns
-from loguru import logger
 
 from diamonds.params import DATA_PATH
+from diamonds.model import create_preproc
+from diamonds.registry import save_model, load_model
 
-# Categorical columns: must be explicit — seaborn loads them as category dtype,
-# but pd.read_csv (cache reload) loses that and returns object dtype instead.
-CATEGORICAL_COLS = ["cut", "color", "clarity"]
+from sklearn.model_selection import train_test_split
+
+logger = loguru.logger
+
+# Import other necessary libraries here
 
 
-def load_data(cache: bool = True) -> pd.DataFrame:
+def load_data() -> pd.DataFrame:
     """
     Load the diamonds dataset.
 
     Parameters
     ----------
-    cache : bool, optional
-        Whether to cache the dataset, by default True
-
+    
     Returns
     -------
     pd.DataFrame
         The diamonds dataset
     """
-    raw_path = os.path.join(DATA_PATH, "raw", "diamonds.csv")
-
-    if cache and os.path.exists(raw_path):
-        logger.info("Loading diamonds dataset from cache: {}", raw_path)
-        return pd.read_csv(raw_path)
-
-    # Source: seaborn built-in dataset (ggplot2 diamonds, 53940 rows)
-    logger.info("Downloading diamonds dataset from seaborn")
-    df = sns.load_dataset("diamonds")
-
-    if cache:
-        os.makedirs(os.path.dirname(raw_path), exist_ok=True)
-        df.to_csv(raw_path, index=False)
-        logger.info("Cached dataset to {}", raw_path)
-
+    logger.info("Loading the diamonds dataset...")
+    csv_path = os.path.join(DATA_PATH,"raw", "diamonds.csv")
+    if not os.path.exists(csv_path):
+        logger.info("Caching the diamonds dataset...")
+        df = sns.load_dataset("diamonds")
+        df.to_csv(csv_path, index=False)
+        logger.info("✅ Diamonds dataset cached successfully.")
+    else:
+        logger.info("Loading the diamonds dataset from cache...")
+        df = pd.read_csv(csv_path)
     return df
-
-
+            
+    
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean the diamonds dataset.
@@ -57,21 +57,17 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         The cleaned diamonds dataset
     """
-    initial_len = len(df)
-
-    # Drop exact duplicates: all 10 columns identical → data entry errors
-    df = df.drop_duplicates()
-    logger.info("Dropped {} duplicate rows", initial_len - len(df))
-
-    # Drop rows where x, y, or z is 0: physically impossible (dimension in mm)
-    before_zero = len(df)
-    df = df[(df[["x", "y", "z"]] != 0).all(axis=1)]
-    logger.info("Dropped {} zero-dimension rows", before_zero - len(df))
-
-    return df.reset_index(drop=True)
+    rows = len(df)
+    def keep_not_null(row) :
+        if 0 in row.values : return False
+        return True
+    df_clean = df[df.apply(keep_not_null,axis=1)]
+    logger.info(f"Cleaned the diamonds dataset: {rows} rows -> {len(df_clean)} rows")
+    return df_clean
 
 
-def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+def preprocess_data( X: pd.DataFrame
+                    , train: bool = True) -> pd.DataFrame:
     """
     Preprocess the diamonds dataset.
 
@@ -85,11 +81,16 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         The preprocessed diamonds dataset
     """
-    # Cast to category: ensures make_column_selector(dtype_exclude="number")
-    # works correctly regardless of whether data came from seaborn or CSV cache
-    df = df.copy()
-    for col in CATEGORICAL_COLS:
-        df[col] = df[col].astype("category")
+    # Instantier la pipeline 
+    if train : 
+        preprocessor = create_preproc()
+        preprocessor.fit(X)
+        save_model(preprocessor, "preprocessor")
+    else :
+        preprocessor = load_model("preprocessor")
+    df_preprocessed = preprocessor.transform(X)
+    logger.info(f"Preprocessed the diamonds dataset: {X.shape} -> {df_preprocessed.shape}") 
+    return df_preprocessed
 
     logger.debug(
         "preprocess_data: {} rows, dtypes corrected for {}", len(df), CATEGORICAL_COLS
@@ -111,11 +112,13 @@ def create_X_y(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     (pd.DataFrame, pd.Series)
         The feature matrix X and target vector y
     """
-    # Target is price; all other columns are features
-    X = df.drop(columns=["price"])
+    
+    X = df.drop(columns="price")
     y = df["price"]
-    logger.debug("X shape: {}, y shape: {}", X.shape, y.shape)
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size,random_state=random_state)
+
     return X, y
+
 
 
 if __name__ == "__main__":
